@@ -1,0 +1,162 @@
+import numpy as np
+import pandas as pd
+from sklearn.model_selection import train_test_split
+from sklearn.metrics import confusion_matrix
+import matplotlib.pyplot as plt
+import seaborn as sns
+import warnings
+
+#Import Models
+from sklearn.linear_model import LogisticRegression
+from sklearn.svm import SVC
+from sklearn.tree import DecisionTreeClassifier
+from sklearn.ensemble import RandomForestClassifier
+
+sns.set()
+%matplotlib inline
+warnings.filterwarnings("ignore")
+df = pd.read_csv('creditcard.csv')
+df.head()
+df.info()
+df.describe()
+print('Data shape:', df.shape)
+X = df.iloc[:, :-1]
+y = df.iloc[:, -1]
+print('X shape:',X.shape)
+print('y shape:',y.shape)
+classes = {0:'Not Fraud', 1:'Fraud'}
+classes_names = ['Not Fraud', 'Fraud']
+print(df.value_counts().rename(index = classes))importance = RandomForestModel.feature_importances_
+
+X_train, X_test, y_train, y_test = X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=.33, random_state=0, shuffle=True)
+print('X_train shape:',X_train.shape)
+print('y_train shape:',y_train.shape)
+
+#Test
+print('X_test shape:',X_test.shape)
+print('y_test:',y_test.shape)
+#Logistic Regression Model
+LogisticRegressionModel = LogisticRegression(max_iter=200)
+LogisticRegressionModel.fit(X_train, y_train)
+LogisticRegressionModel_y_pred = LogisticRegressionModel.predict(X_test)
+
+
+#Score
+LogisticRegressionModel_TrainScore =  round(LogisticRegressionModel.score(X_train, y_train) * 100, 2)
+LogisticRegressionModel_TestScore = round(LogisticRegressionModel.score(X_test, y_test) * 100, 2)
+
+print('Logistic Regression Train Score: ', LogisticRegressionModel_TrainScore)
+print('Logistic Regression Test Score: ', LogisticRegressionModel_TestScore)
+
+
+#Confusion Matrix
+LogisticRegressionModel_CM = confusion_matrix(y_test, LogisticRegressionModel_y_pred)
+LogisticRegressionModel_ConfusionMatrix = pd.DataFrame(LogisticRegressionModel_CM, index=classes_names, columns=classes_names)
+
+sns.heatmap(LogisticRegressionModel_ConfusionMatrix, annot=True, cbar=None, cmap="OrRd", fmt = 'g')
+plt.title("Logistic Regression Confusion Matrix"), plt.tight_layout()
+plt.ylabel("True Class"), plt.xlabel("Predicted Class")
+plt.show()
+#SVC Model
+SVCModel = SVC(kernel= 'rbf', max_iter=100, C=1.0, gamma='auto')
+SVCModel.fit(X_train, y_train)
+SVCModel_y_pred = SVCModel.predict(X_test)
+
+#Score
+SVCModel_TrainScore =  round(SVCModel.score(X_train, y_train) * 100, 2)
+SVCModel_TestScore = round(SVCModel.score(X_test, y_test) * 100, 2)
+
+print('SVC Train Score: ', SVCModel_TrainScore)
+print('SVC Test Score: ',SVCModel_TestScore)
+
+
+#Confusion Matrix
+SVCModel_CM = confusion_matrix(y_test, SVCModel_y_pred)
+SVCModel_ConfusionMatrix = pd.DataFrame(SVCModel_CM, index=classes_names, columns=classes_names)
+
+sns.heatmap(SVCModel_ConfusionMatrix, annot=True, cbar=None, cmap="Purples", fmt = 'g')
+
+plt.title("SVC Confusion Matrix"), plt.tight_layout()
+plt.ylabel("True Class"), plt.xlabel("Predicted Class")
+plt.show()
+#Decision Tree Model
+DecisionTreeModel = DecisionTreeClassifier(criterion='gini',max_depth=5,random_state=33) #criterion can be entropy
+DecisionTreeModel.fit(X_train, y_train)
+DecisionTreeModel_y_pred = DecisionTreeModel.predict(X_test)
+
+
+#Score
+DecisionTreeModel_TrainScore =  round(DecisionTreeModel.score(X_train, y_train) * 100, 2)
+DecisionTreeModel_TestScore = round(DecisionTreeModel.score(X_test, y_test) * 100, 2)
+
+print('Decision Tree Train Score: ' , DecisionTreeModel_TrainScore)
+print('Decision Tree Test Score: ' , DecisionTreeModel_TestScore)
+
+
+#Confusion Matrix
+DecisionTreeModel_CM = confusion_matrix(y_test, DecisionTreeModel_y_pred)
+DecisionTreeModel_ConfusionMatrix = pd.DataFrame(DecisionTreeModel_CM, index=classes_names, columns=classes_names)
+
+sns.heatmap(DecisionTreeModel_ConfusionMatrix, annot=True, cbar=None, cmap="Blues", fmt = 'g')
+plt.title("Decision Tree Confusion Matrix"), plt.tight_layout()
+plt.ylabel("True Class"), plt.xlabel("Predicted Class")
+plt.show()
+#Random Forest Model
+RandomForestModel = RandomForestClassifier(criterion = 'gini',n_estimators=200,max_depth=5,random_state=33, n_jobs=-1)
+RandomForestModel.fit(X_train, y_train)
+RandomForestModel_y_pred = RandomForestModel.predict(X_test)
+
+
+#Score
+RandomForestModel_TrainScore =  round(RandomForestModel.score(X_train, y_train) * 100, 2)
+RandomForestModel_TestScore = round(RandomForestModel.score(X_test, y_test) * 100, 2)
+
+print('RandomForestModel Train Score: ' , RandomForestModel_TrainScore)
+print('RandomForestModel Test Score: ' , RandomForestModel_TestScore)
+
+
+#Confusion Matrix
+RandomForestModel_CM = confusion_matrix(y_test, RandomForestModel_y_pred)
+RandomForestModel_ConfusionMatrix = pd.DataFrame(RandomForestModel_CM, index=classes_names, columns=classes_names)
+
+sns.heatmap(RandomForestModel_ConfusionMatrix, annot=True, cbar=None, cmap="Greens", fmt = 'g')
+plt.title("Random Forest Confusion Matrix"), plt.tight_layout()
+plt.ylabel("True Class"), plt.xlabel("Predicted Class")
+plt.show()
+models = pd.DataFrame({
+    'Model': ['Logistic Regression', 'Support Vector Machines', 'Decision Tree', 'Random Forest'],
+    'Train Score': [LogisticRegressionModel_TrainScore, SVCModel_TrainScore, DecisionTreeModel_TrainScore, RandomForestModel_TrainScore],
+    'Test Score': [LogisticRegressionModel_TestScore, SVCModel_TestScore, DecisionTreeModel_TestScore, RandomForestModel_TestScore]})
+
+models.sort_values(['Train Score', 'Test Score'], ascending=[False, False])
+fig, ax = plt.subplots(2, 2,figsize=(20,15))
+fig.tight_layout(pad=10.0)
+sns.set(font_scale=2)
+
+sns.heatmap(LogisticRegressionModel_ConfusionMatrix, ax=ax[0][0], annot=True, cbar=None, cmap="Reds", fmt = 'g')
+ax[0][0].set_title("Logistic Regression", fontsize=18)
+ax[0][0].set_ylabel("True Class"), ax[0][0].set_xlabel("Predicted Class")
+
+
+sns.heatmap(SVCModel_ConfusionMatrix, ax=ax[0][1], annot=True, cbar=None, cmap="Purples", fmt = 'g')
+ax[0][1].set_title("SVC", fontsize=18)
+ax[0][1].set_ylabel("True Class"), ax[0][1].set_xlabel("Predicted Class")
+
+
+sns.heatmap(DecisionTreeModel_ConfusionMatrix, ax=ax[1][0], annot=True, cbar=None, cmap="Blues", fmt = 'g')
+ax[1][0].set_title("Decision Tree", fontsize=18)
+ax[1][0].set_ylabel("True Class"), ax[1][0].set_xlabel("Predicted Class")
+
+
+sns.heatmap(RandomForestModel_ConfusionMatrix, ax=ax[1][1], annot=True, cbar=None, cmap="Greens", fmt = 'g')
+ax[1][1].set_title("Random Forest", fontsize=18),
+ax[1][1].set_ylabel("True Class"), ax[1][1].set_xlabel("Predicted Class")
+
+plt.show()
+importance = RandomForestModel.feature_importances_
+
+plt.figure(figsize=(30,15))
+plt.ylabel('Importance', fontsize=18), plt.xlabel('Features', fontsize=18)
+plt.title("Relation between Features and Importance", fontsize=18)
+plt.plot(X.columns, importance, 'o-', color="#2492ff", markersize=10, label="Training score")
+plt.show()
